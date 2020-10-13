@@ -54,7 +54,6 @@ class MRTFIDF(MRJob):
             ),
             MRStep(reducer=self.reducer_compute_result),
         ]
-        # raise Exception('There must be at ')
 
     # line => [(word, doc), 1]
     def mapper_get_words(self, _, line):
@@ -95,7 +94,7 @@ class MRTFIDF(MRJob):
         idf = math.log(NUMBER_OF_DOCS / m)
         yield doc, (word, tf * idf)
 
-    # doc, [word, TF*IDF] + search_request => doc, value for doc
+    # doc, [word, TF*IDF] + search_request => None, (doc, doc rate)
     def reducer_compute_doc_tf_idf(self, doc, words):
         request = set(WORD_RE.findall(self.options.search_request))
         sum_values = 0
@@ -104,6 +103,7 @@ class MRTFIDF(MRJob):
                 sum_values += word[1]
         yield None, (doc, sum_values / len(request))
 
+    # [(doc, doc rate)] => None, [sorted docs]
     def reducer_compute_result(self, _, values):
         yield None, [
             name[len('file://') :]
