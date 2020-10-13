@@ -8,13 +8,13 @@ from mrjob.job import MRJob
 from mrjob.step import MRStep
 from mrjob.protocol import JSONValueProtocol
 
-CWD = os.path.abspath(os.getcwd())
-NUMBER_OF_DOCS = len(sys.argv) - 3  # script name, param name, param value
+
 WORD_RE = re.compile(r"[\w']+")
 
 
 def _log(text):
-    with open(os.path.join(CWD, 'debug.log'), 'a') as file:
+    cwd = os.path.abspath(os.getcwd())
+    with open(os.path.join(cwd, 'debug.log'), 'a') as file:
         print(datetime.datetime.now().isoformat(), '\t', str(text), file=file)
 
 
@@ -26,11 +26,18 @@ class MRTFIDF(MRJob):
         super().configure_args()
         self.add_passthru_arg('--search_request', '-s', default='')
         self.add_passthru_arg(
-            '--number_of_docs',
+            '--response_size',
             '-n',
             type=int,
             default=5,
             help='Maximum number of results',
+        )
+        self.add_passthru_arg(
+            '--docbase_size',
+            '-d',
+            type=int,
+            required=True,
+            help='Number of docs being passed',
         )
 
     def steps(self):
@@ -91,12 +98,15 @@ class MRTFIDF(MRJob):
     def mapper_compute_word_tf_idf(self, word, count):
         doc, n, N, m = count
         tf = n / N
-        idf = math.log(NUMBER_OF_DOCS / m)
+        idf = math.log(self.options.docbase_size / m)
         yield doc, (word, tf * idf)
 
     # doc, [word, TF*IDF] + search_request => None, (doc, doc rate)
     def reducer_compute_doc_tf_idf(self, doc, words):
         request = set(WORD_RE.findall(self.options.search_request))
+        if not request:
+            yield None, (doc, 0)
+            return
         sum_values = 0
         for word in words:
             if word[0] in request:
@@ -109,10 +119,9 @@ class MRTFIDF(MRJob):
             name[len('file://') :]
             for name, _ in sorted(
                 list(values), key=lambda el: (-el[1], el[0]),
-            )[: self.options.number_of_docs]
+            )[: self.options.response_size]
         ]
 
 
 if __name__ == '__main__':
     MRTFIDF.run()
-
