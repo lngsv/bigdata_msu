@@ -15,7 +15,8 @@ $ python3 tf_idf.py [[--search_request|-s] request] [[--response_size|-n] respon
 `number_of_files` - количество передаваемых файлов (из которых формируется выдача). \
 `files` - файлы, по которым идет поиск. \
 `output_directory` - имя для папки, в которую запишется файл с выходным списком.
-Пример
+
+### Пример
 ```(bash)
 $ python3 tf_idf.py -s "b" -n 4 -d 6 docs/* -o out
 $ cat out/part-00000
