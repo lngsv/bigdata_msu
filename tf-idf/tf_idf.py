@@ -69,8 +69,8 @@ class MRTFIDF(MRJob):
             yield (word, filename), 1
 
     # (word, doc), [ki] => (word, doc), n
-    def reducer_sum_counts(self, word, counts):
-        yield word, sum(counts)
+    def reducer_sum_counts(self, word_doc, counts):
+        yield word_doc, sum(counts)
 
     # (word, doc), n => word, (doc, n)
     def mapper_regroup_word_doc(self, word_doc, count):
@@ -116,8 +116,8 @@ class MRTFIDF(MRJob):
     # [(doc, doc rate)] => None, [sorted docs]
     def reducer_compute_result(self, _, values):
         yield None, [
-            name[len('file://') :]
-            for name, _ in sorted(
+            (name[len('file://') :], rate)
+            for name, rate in sorted(
                 list(values), key=lambda el: (-el[1], el[0]),
             )[: self.options.response_size]
         ]
