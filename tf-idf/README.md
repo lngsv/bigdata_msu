@@ -18,7 +18,7 @@ $ python3 tf_idf.py [[--search_request|-s] request] [[--response_size|-n] respon
 
 ### Пример
 ```(bash)
-$ python3 tf_idf.py -s "b" -n 4 -d 6 docs/* -o out
+$ python3 tf_idf.py -s "b a" -n 5 -d 6 docs/* -o out
 $ cat out/part-00000
 ```
 
