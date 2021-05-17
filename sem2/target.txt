@@ -1,0 +1,38 @@
+Composer: {
+    "composer_id": int
+    "name_rus": string
+    "name_en": string
+    "birth_date": string
+    "death_date": string
+    "country": string
+    "sheets": [
+        Sheet: {
+            "description": string
+            "library_info": string
+            "publication_year": string
+            "title": string
+            "author": string
+        }
+    ]
+}
+
+composers_info:
+{
+    "composer_id": int
+    "name_rus": string
+    "name_en": string
+    "birth_date": string
+    "death_date": string
+    "country": string
+}
+
+sheets_info:
+{
+    "composer_ids": [int]
+    "library_info": string
+    "publication_year": string
+    "title": string
+    "description": string
+    "author": string
+}
+
